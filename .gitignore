@@ -28,7 +28,7 @@ _testmain.go
 *.out
 
 # external packages folder
-vendor/*
+vendor/
 !vendor/vendor.json
 
 ## IDE specific
