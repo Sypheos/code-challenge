@@ -1,6 +1,37 @@
 {
 	"comment": "",
 	"ignore": "test",
-	"package": [],
+	"package": [
+		{
+			"checksumSHA1": "fTVPhPLsi9VCVRSHVapugwz2Lps=",
+			"path": "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git",
+			"revision": "617c801af238c3af2d9e72c5d4a0f02edad03ce5",
+			"revisionTime": "2016-02-08T11:21:59Z"
+		},
+		{
+			"checksumSHA1": "0GLCFOXSJjCjvlsurRP/Pt2WvdE=",
+			"path": "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git/packets",
+			"revision": "617c801af238c3af2d9e72c5d4a0f02edad03ce5",
+			"revisionTime": "2016-02-08T11:21:59Z"
+		},
+		{
+			"checksumSHA1": "br8f8s0vtwRq5P2DEtByXg5s4V0=",
+			"path": "github.com/eclipse/paho.mqtt.golang",
+			"revision": "d4f545eb108a2d19f9b1a735689dbfb719bc21fb",
+			"revisionTime": "2016-12-24T12:24:24Z"
+		},
+		{
+			"checksumSHA1": "wPreCwXsA/oU2R+lkOGpR6skdA0=",
+			"path": "github.com/eclipse/paho.mqtt.golang/packets",
+			"revision": "d4f545eb108a2d19f9b1a735689dbfb719bc21fb",
+			"revisionTime": "2016-12-24T12:24:24Z"
+		},
+		{
+			"checksumSHA1": "7EZyXN0EmZLgGxZxK01IJua4c8o=",
+			"path": "golang.org/x/net/websocket",
+			"revision": "69d4b8aa71caaaa75c3dfc11211d1be495abec7c",
+			"revisionTime": "2017-01-02T20:58:43Z"
+		}
+	],
 	"rootPath": "code-challenge"
 }
