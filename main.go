@@ -10,6 +10,16 @@ import (
 
 var uri string
 
+const ROOM1_TOPIC = "/actuators/room-1"
+const QOS byte = 0
+
+type sensor struct {
+
+	SensorID string `json:"sensor_id"`
+	Type     string `json:"type"`
+	Value    interface{} `json:"value"`
+}
+
 func main() {
 
 	flag.Parse()
@@ -20,9 +30,16 @@ func main() {
 	client := newClient(uri)
 	defer client.Disconnect(250)
 
-	registerTemp(client)
+	startHeat(client)
+	ch := startMotion(client)
 	for {
 		select {
+		case b := <- ch:
+			if b {
+				startHeat(client)
+			} else {
+				stopHeat(client)
+			}
 		case <-time.After(time.Millisecond * 500):
 			reader := bufio.NewReader(os.Stdin)
 			text, _ := reader.ReadString('\n')

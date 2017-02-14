@@ -1,15 +1,13 @@
 package main
 
 import (
-	"log"
-	"github.com/eclipse/paho.mqtt.golang"
 	"encoding/json"
+	"github.com/eclipse/paho.mqtt.golang"
+	"log"
 	"sort"
 )
 
 const TEMP_TOPIC = "/readings/temperature"
-const ROOM1_TOPIC = "/actuators/room-1"
-const QOS byte = 0
 
 var heatHist = make([]float64, 10) //should later be replace by db
 
@@ -19,32 +17,21 @@ const TEMP_TARGET = 22
 const TEMP_HOT = 25
 const TEMP_HELL = 30
 
-var heatMap map[int] float64 = map[int] float64 {
-	TEMP_LOW: 100,
-	TEMP_AVG: 60,
+var heatMap map[int]float64 = map[int]float64{
+	TEMP_LOW:    100,
+	TEMP_AVG:    60,
 	TEMP_TARGET: 30,
-	TEMP_HOT: 5,
-	TEMP_HELL: 0}
+	TEMP_HOT:    5,
+	TEMP_HELL:   0}
 
-
-type sensor struct {
-
-	SensorID string `json:"sensor_id"`
-	Type     string `json:"type"`
-	Value    float64 `json:"value"`
-}
-
-type home struct {
-	mqtt.Client
-}
-
-func registerTemp(client mqtt.Client) {
+//startHeat Subscribe to the temperature topic and create a handler.
+//The created handler will, if the received message well formatted, call the calcHeatOutput function
+func startHeat(client mqtt.Client) {
 
 	for i := range heatHist {
 		heatHist[i] = 0
 	}
 	client.Subscribe(TEMP_TOPIC, QOS, func(client mqtt.Client, msg mqtt.Message) {
-		log.Println(string(msg.Payload()))
 
 		m := sensor{}
 		if err := json.Unmarshal(msg.Payload(), &m); err != nil {
@@ -52,11 +39,25 @@ func registerTemp(client mqtt.Client) {
 			return
 		}
 		if m.Type == "temperature" {
-			calcHeatOutput(client, m.Value)
+			if v, ok := m.Value.(float64); ok {
+				calcHeatOutput(client, v)
+			} else {
+				log.Println(TEMP_TOPIC, "Wrong argument type for value in expected float64")
+			}
 		}
 	})
 }
 
+//stopHeat close the valve and unsuscribe from the topic.
+func stopHeat(client mqtt.Client) {
+
+	publishTemp(client, 0)
+	client.Unsubscribe(TEMP_TOPIC)
+}
+
+//caclHeatOutput calculate the avg temperature based on the last 10 temperature received.
+//It will then select the valve output from the heatMap and publish it.
+//The algorithm try to make use the heater in phase: Strong, low, strong. in order to save power
 func calcHeatOutput(client mqtt.Client, temp float64) {
 
 	heatHist = append(heatHist[1:], temp)
@@ -65,7 +66,7 @@ func calcHeatOutput(client mqtt.Client, temp float64) {
 	for _, val := range heatHist {
 		avg += float64(val)
 	}
-	avg = avg/float64(len(heatHist))
+	avg = avg / float64(len(heatHist))
 	keys := []int{}
 	for key := range heatMap {
 		keys = append(keys, key)
@@ -79,8 +80,10 @@ func calcHeatOutput(client mqtt.Client, temp float64) {
 	}
 }
 
+//publishTemp send val as the valve output on the room1 topic.
+//for safety purpose val is maintained between [0 - 100]
 func publishTemp(client mqtt.Client, val float64) {
-	s, err := json.Marshal(map[string]float64{"level":val})
+	s, err := json.Marshal(map[string]int{"level": int(val)%100})
 	if err != nil {
 		log.Println(err)
 		return
