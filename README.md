@@ -22,7 +22,8 @@ sensors activity in a database. (solution is discussed later)
 
 # Setup
 
-Install go, at least 1.7. You can get it from [here](https://golang.org/)
+Install go, at least 1.7. You can get it from [here](https://golang.org/).
+Be really carful to read all the instruction and set your GOPATH !
 
 Get a MQTT broker !
 
@@ -31,10 +32,22 @@ The simple way, if you already have docker:
     docker run -it -p 1883:1883 --name=mosquitto  toke/mosquitto
    ```
 
-Extract the archive and run
+Install govendor
 ```
-    go run *.go -uri=your_mqtt_broker_u
+go get -u github.com/kardianos/govendor
+```
+
+Then install the package and run
+```
+go get github.com/Sypheos/code-challenge
+cd $GOPATH/src/github.com/Sypheos/code-challenge/example
+go run main.go -uri=tcp://localhost:1883
    ```
+
+
+# Technical Upgrade
+
+Create an interface and make Subscription structure to ease their management.
 
 # Possible Upgrade
 
